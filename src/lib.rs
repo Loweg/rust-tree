@@ -1,8 +1,9 @@
+#![feature(return_position_impl_trait_in_trait)]
+
 use std::iter;
 
 pub trait Tree: Sized {
-	type Iter<'a, T>: Iterator<Item=&'a T> where T: 'a, Self: 'a;
-	fn children<'a>(&'a self) -> Self::Iter<'a, Self>;
+	fn children<'a>(&'a self) -> impl Iterator<Item = &'a Self> where Self: 'a;
 
 	fn df_traverse<'a>(&'a self) -> TreeIter<'a, Self> {
 		TreeIter {
@@ -36,8 +37,7 @@ mod tests {
 		children: Vec<TestTree>
 	}
 	impl Tree for TestTree {
-		type Iter<'a, T> = std::slice::Iter<'a, T> where T: 'a;
-		fn children<'a>(&'a self) -> Self::Iter<'a, Self> {
+		fn children<'a>(&'a self) -> impl Iterator<Item = &'a Self> where Self: 'a {
 			self.children.iter()
 		}
 	}
